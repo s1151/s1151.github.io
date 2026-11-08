@@ -104,21 +104,77 @@ body::after {
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  font-family: inherit;
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
   color: var(--muted);
   padding: 9px 18px;
+  background: none;
   border: 1px solid var(--line);
   border-radius: 999px;
+  cursor: pointer;
   transition: color 0.25s, border-color 0.25s, background 0.25s;
 }
 
-.contact-btn:hover {
+.contact-btn:hover,
+.contact-btn[aria-expanded="true"] {
   color: var(--text);
   border-color: rgba(255, 255, 255, 0.28);
   background: rgba(255, 255, 255, 0.04);
+}
+
+/* ---------- Contact popover (header) ---------- */
+.contact-nav {
+  position: relative;
+}
+
+.contact-pop {
+  position: absolute;
+  top: calc(100% + 12px);               /* drops down from the button */
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 260px;
+  padding: 6px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.contact-pop[hidden] {
+  display: none;                        /* beat the display:flex above  */
+}
+
+.contact-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.contact-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.contact-label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.contact-value {
+  font-size: 13px;
+  color: var(--text);
+  overflow-wrap: anywhere;              /* long address on narrow screens */
 }
 
 /* ---------- Stage (main viewport area) ---------- */
@@ -445,7 +501,8 @@ body::after {
   .book,
   .spread,
   .arrow,
-  .contact-btn {
+  .contact-btn,
+  .contact-row {
     transition: none;
   }
 }

@@ -26,7 +26,21 @@
                 stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
-      <a href="mailto:hello@example.com" class="contact-btn">Contact</a>
+      <div class="contact-nav">
+        <button class="contact-btn" id="contactBtn" type="button"
+                aria-haspopup="true" aria-expanded="false">Contact</button>
+        <div class="contact-pop" id="contactPop" hidden>
+          <a class="contact-row" href="mailto:shane.reynolds.business@gmail.com">
+            <span class="contact-label">Email</span>
+            <span class="contact-value">shane.reynolds.business@gmail.com</span>
+          </a>
+          <a class="contact-row" href="https://www.linkedin.com/in/shane-n-reynolds/"
+             target="_blank" rel="noopener">
+            <span class="contact-label">LinkedIn</span>
+            <span class="contact-value">linkedin.com/in/shane-n-reynolds</span>
+          </a>
+        </div>
+      </div>
     </nav>
   </header>
 

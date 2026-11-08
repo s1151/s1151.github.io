@@ -543,6 +543,47 @@ document.addEventListener('keydown', (event) => {
 });
 
 /* ---------------------------------------------------------
+   Contact popover — email + LinkedIn drop-down in the header.
+   Same behaviour as the page menu: toggle on the button,
+   close on outside click or Escape.
+   --------------------------------------------------------- */
+const contactBtn = document.getElementById('contactBtn');
+const contactPop = document.getElementById('contactPop');
+
+let contactOpen = false;
+
+function openContact() {
+  contactOpen = true;
+  contactPop.hidden = false;
+  contactBtn.setAttribute('aria-expanded', 'true');
+}
+
+function closeContact() {
+  contactOpen = false;
+  contactPop.hidden = true;
+  contactBtn.setAttribute('aria-expanded', 'false');
+}
+
+contactBtn.addEventListener('click', (event) => {
+  event.stopPropagation();
+  if (contactOpen) closeContact(); else openContact();
+});
+
+// Close on any click outside the header widget, or on Escape.
+document.addEventListener('click', (event) => {
+  if (contactOpen && !event.target.closest('.contact-nav')) closeContact();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeContact();
+});
+
+// Following a link also dismisses the popover.
+contactPop.addEventListener('click', (event) => {
+  if (event.target.closest('a')) closeContact();
+});
+
+/* ---------------------------------------------------------
    Type-to-jump: digits pressed anywhere form a page number.
    Numbers that can't be extended ("2"–"9" in a 19-page book)
    jump instantly; "1" waits briefly in case it becomes 10–19.
