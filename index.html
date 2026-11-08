@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pho.design — Portfolio</title>
+  <meta name="description" content="Design portfolio presented as a flat-lay open book." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===================== Header ===================== -->
+  <header class="site-header">
+    <a class="site-title" href="#" aria-label="pho.design — home">
+      <img class="site-logo" src="pho_logo/PHO-LOGO-WHITE.svg" alt="pho.design" />
+    </a>
+    <nav class="header-nav">
+      <!-- Downloads the portfolio PDF (served from pdf_download/) -->
+      <a class="contact-btn" href="pdf_download/previewjpg1.pdf"
+         download="pho.design-portfolio.pdf">
+        PDF
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 4v10m0 0l-4-4m4 4l4-4" stroke="currentColor"
+                stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3" stroke="currentColor"
+                stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <a href="mailto:hello@example.com" class="contact-btn">Contact</a>
+    </nav>
+  </header>
+
+  <!-- ================== Book carousel ================== -->
+  <main class="stage">
+
+    <!-- Previous-spread arrow -->
+    <button class="arrow arrow-prev" id="prevBtn" type="button" aria-label="Previous pages">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="1.6"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Flat-lay open book: two-page landscape spread.
+         Clicking the left page turns back, the right page forward. -->
+    <div class="book-wrap">
+      <!-- Starts as .is-single: the first view is the front cover -->
+      <div class="book is-single" id="book">
+
+        <!-- Two stacked spread layers. Spread <-> spread turns render
+             straight into the visible layer (instant swap). Cover <->
+             spread turns crossfade the hidden layer in over the
+             visible one, timed with the book's height morph. -->
+        <div class="spread single-right is-visible is-top" id="spreadA">
+          <figure class="page page-left">
+            <img src="" alt="Left portfolio page" draggable="false" />
+          </figure>
+          <figure class="page page-right">
+            <img src="" alt="Right portfolio page" draggable="false" />
+          </figure>
+        </div>
+
+        <div class="spread" id="spreadB" aria-hidden="true">
+          <figure class="page page-left">
+            <img src="" alt="" draggable="false" />
+          </figure>
+          <figure class="page page-right">
+            <img src="" alt="" draggable="false" />
+          </figure>
+        </div>
+
+        <!-- Centre crease / spine shading overlay (purely decorative) -->
+        <div class="book-spine" aria-hidden="true"></div>
+
+      </div>
+    </div>
+
+    <!-- Next-spread arrow -->
+    <button class="arrow arrow-next" id="nextBtn" type="button" aria-label="Next pages">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="1.6"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+  </main>
+
+  <!-- ===================== Footer ===================== -->
+  <footer class="site-footer">
+    <span class="copyright">&copy; 2026 pho.design</span>
+
+    <!-- Click the indicator for the jump menu, or just start
+         typing a page number anywhere on the page -->
+    <div class="page-nav">
+      <button class="page-indicator" id="pageIndicator" type="button"
+              aria-haspopup="true" aria-expanded="false" aria-live="polite"
+              title="Jump to page">Page 1 of 19</button>
+      <div class="page-menu" id="pageMenu" hidden></div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

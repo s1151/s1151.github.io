@@ -1,0 +1,451 @@
+/* =========================================================
+   pho.design — flat-lay book portfolio
+   ========================================================= */
+
+/* ---------- Reset & design tokens ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:        #181818;                 /* flat-lay surface            */
+  --bg-soft:   #1e1e1e;                 /* slightly lifted neutral     */
+  --text:      #e8e6e1;
+  --muted:     #8a8781;
+  --line:      rgba(255, 255, 255, 0.08);
+  --paper:     #f4f1ea;                 /* page base colour            */
+  --accent:    #c9b48a;                 /* subtle warm accent          */
+  --header-h:  72px;
+  --footer-h:  64px;
+  --ease:      cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Cover <-> spread morph: deliberately slow and symmetrical
+     (ease-in-out) — it only happens at the beginning and end of the
+     book, so it can afford to be a calmer experience. */
+  --cover-ms:   500ms;
+  --cover-ease: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Book geometry: two A-series landscape pages (297 × 210 mm, i.e.
+     99:70 each) side by side form a 99:35 spread. Width AND height
+     are declared explicitly with matching caps, so the cover <->
+     spread morph can transition height — aspect-ratio alone can't
+     be transitioned reliably across browsers. */
+  --book-max-w:  1240px;
+  --stage-pad-x: clamp(32px, 10vw, 160px); /* 2× .stage side padding */
+  --chrome-h:    200px;                    /* header + footer + stage padding */
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  overflow: hidden;                     /* single centred viewport     */
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Anti-banding grain ----------
+   The book's large soft drop shadows are smooth dark gradients,
+   which quantise into visible bands on the near-black surface.
+   A faint monochrome noise layer dithers those steps away. It sits
+   above everything (pointer-events: none) at a barely-there opacity;
+   raise/lower `opacity` to taste. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  flex: 0 0 auto;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(20px, 4vw, 48px);
+}
+
+.site-title {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.site-logo {
+  display: block;
+  height: 22px;
+  width: auto;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--muted);
+  padding: 9px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: color 0.25s, border-color 0.25s, background 0.25s;
+}
+
+.contact-btn:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ---------- Stage (main viewport area) ---------- */
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px clamp(16px, 5vw, 80px);
+  /* Custom pinch-zoom lives in script.js — stop the browser's own */
+  touch-action: none;
+}
+
+.book-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* ---------- The book ---------- */
+.book {
+  position: relative;
+  /* Sharp corners — no border-radius. */
+
+  /* Zoom transforms are driven by script.js, lerped per animation
+     frame for a smooth continuous feel — transform is deliberately
+     NOT in this element's transition list (the JS lerp does the
+     smoothing; a CSS transition would fight it). The origin must
+     stay at the top-left corner for the cursor-anchored math. */
+  transform-origin: 0 0;
+  will-change: transform;
+
+  /* Explicit width + height. Each min() resolves to the same binding
+     constraint in every viewport, so the pair always keeps the 99:35
+     spread ratio while letting height participate in transitions. */
+  width: min(var(--book-max-w), 100%, calc((100vh - var(--chrome-h)) * 99 / 35));  /* fallback */
+  width: min(var(--book-max-w), 100%, calc((100dvh - var(--chrome-h)) * 99 / 35));
+  height: min(calc(var(--book-max-w) * 35 / 99),
+              calc((100vw - var(--stage-pad-x)) * 35 / 99),
+              calc(100vh - var(--chrome-h)));                                      /* fallback */
+  height: min(calc(var(--book-max-w) * 35 / 99),
+              calc((100vw - var(--stage-pad-x)) * 35 / 99),
+              calc(100dvh - var(--chrome-h)));
+
+  /* Cover <-> spread turns morph the box: on typical screens only
+     the height changes, so the centred book crops in from the top
+     and bottom (and back out again). Spread <-> spread turns don't
+     animate at all — instant swaps. */
+  transition:
+    width  var(--cover-ms) var(--cover-ease),
+    height var(--cover-ms) var(--cover-ease);
+
+  /* Flat-lay drop shadows: a tight contact shadow plus a wide,
+     soft ambient shadow so the book appears to rest on a surface. */
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.45),
+    0 16px 36px rgba(0, 0, 0, 0.40),
+    0 40px 80px rgba(0, 0, 0, 0.45);
+}
+
+/* Single-page view (front / back cover): one A-landscape page at the
+   spread's full width and double its height, centred by .book-wrap.
+   The crease shadow is hidden while the book is "closed". */
+.book.is-single {
+  width: min(var(--book-max-w), 100%, calc((100vh - var(--chrome-h)) * 99 / 70));  /* fallback */
+  width: min(var(--book-max-w), 100%, calc((100dvh - var(--chrome-h)) * 99 / 70));
+  height: min(calc(var(--book-max-w) * 70 / 99),
+              calc((100vw - var(--stage-pad-x)) * 70 / 99),
+              calc(100vh - var(--chrome-h)));                                      /* fallback */
+  height: min(calc(var(--book-max-w) * 70 / 99),
+              calc((100vw - var(--stage-pad-x)) * 70 / 99),
+              calc(100dvh - var(--chrome-h)));
+}
+
+.book.is-single .book-spine { opacity: 0; }
+
+/* ---------- Spread layers (crossfade pair) ---------- */
+.spread {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow: hidden;
+  background: var(--paper);
+  opacity: 0;
+  /* The fade only runs on cover <-> spread turns (script toggles
+     is-visible on the hidden layer then). Spread <-> spread turns
+     render into the already-visible layer, so they stay instant. */
+  transition: opacity var(--cover-ms) ease;
+}
+
+.spread.is-visible { opacity: 1; }
+.spread.is-top     { z-index: 2; }
+
+/* During a cover crossfade the outgoing layer waits out the first
+   half beneath the opaque-ish incoming layer, then fades quickly —
+   the blend stays symmetric without the dark surface bleeding
+   through two half-transparent paper layers mid-fade. */
+.spread.is-leaving {
+  transition: opacity calc(var(--cover-ms) / 2) ease calc(var(--cover-ms) / 2);
+}
+
+/* Single-page spreads (covers): the unused half is removed so the
+   remaining page fills and centres the single-page book. */
+.spread.single-left  .page-right { display: none; }
+.spread.single-right .page-left  { display: none; }
+
+/* ---------- Individual pages ---------- */
+.page {
+  position: relative;
+  flex: 1 1 50%;
+  overflow: hidden;
+  cursor: pointer;                      /* pages are clickable         */
+}
+
+/* Images always render at their intrinsic ratio (never stretched).
+   Each is anchored to the CENTRE SEAM, so the pair behaves like one
+   connected long image: cover <-> spread morphs crop the OUTER edges
+   only, and content at the seam never slides or rescales on its own.
+   (At final spread geometry each image exactly fills its half —
+   a 99:70 page box holding a 99:70 image.) */
+.page img {
+  position: absolute;
+  top: 0;
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: none;                      /* may overflow the outer edge */
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.page-left  img { right: 0; }           /* seam = right edge of left page  */
+.page-right img { left:  0; }           /* seam = left edge of right page  */
+
+/* Single-page mode (covers): the visible page spans the whole book,
+   so its image fills the full WIDTH and overflows the top and bottom
+   equally — the height morph then crops it symmetrically. */
+.spread.single-right .page-right img,
+.spread.single-left  .page-left  img {
+  top: 50%;
+  left: 0;
+  right: auto;
+  width: 100%;
+  height: auto;
+  transform: translateY(-50%);
+}
+
+/* Blank half of an odd middle spread: bare paper, no image */
+.page.is-blank {
+  cursor: default;
+}
+
+.page.is-blank img {
+  display: none;
+}
+
+/* Faint shading where each page rolls toward the spine */
+.page-left  { box-shadow: inset -28px 0 36px -28px rgba(0, 0, 0, 0.18); }
+.page-right { box-shadow: inset  28px 0 36px -28px rgba(0, 0, 0, 0.18); }
+
+/* ---------- Spine / centre crease ---------- */
+.book-spine {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  transition: opacity 300ms ease;       /* fades out on single covers  */
+  background:
+    /* subtle vertical gradient down the centre crease */
+    linear-gradient(to right,
+      rgba(0, 0, 0, 0)    47.5%,
+      rgba(0, 0, 0, 0.04) 49.3%,
+      rgba(0, 0, 0, 0.10) 50%,
+      rgba(0, 0, 0, 0.04) 50.7%,
+      rgba(0, 0, 0, 0)    52.5%),
+    /* whisper of shading at the outer page edges */
+    linear-gradient(to right,
+      rgba(0, 0, 0, 0.07), rgba(0, 0, 0, 0) 4%,
+      rgba(0, 0, 0, 0) 96%, rgba(0, 0, 0, 0.07));
+}
+
+/* ---------- Navigation arrows ---------- */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(24, 24, 24, 0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.25s, border-color 0.25s,
+              background 0.25s, opacity 0.25s, transform 0.15s;
+}
+
+.arrow:hover:not(:disabled) {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(30, 30, 30, 0.85);
+}
+
+.arrow:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.arrow:disabled {
+  opacity: 0.22;
+  cursor: default;
+}
+
+.arrow:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.arrow-prev { left:  clamp(10px, 3.5vw, 44px); }
+.arrow-next { right: clamp(10px, 3.5vw, 44px); }
+
+/* ---------- Footer ---------- */
+.site-footer {
+  flex: 0 0 auto;
+  height: var(--footer-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(20px, 4vw, 48px);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+/* ---------- Page indicator + jump menu ---------- */
+.page-nav {
+  position: relative;
+}
+
+.page-indicator {
+  font: inherit;                        /* match the footer's text     */
+  letter-spacing: inherit;
+  color: var(--muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin: -6px -10px;                   /* larger hit area, same layout */
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.25s, border-color 0.25s;
+}
+
+.page-indicator:hover,
+.page-indicator[aria-expanded="true"] {
+  color: var(--text);
+  border-color: var(--line);
+}
+
+.page-menu {
+  position: absolute;
+  bottom: calc(100% + 12px);            /* opens upward from the footer */
+  right: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  min-width: 132px;
+  padding: 6px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.page-menu[hidden] {
+  display: none;                        /* beat the display:grid above  */
+}
+
+.page-menu button {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;                  /* square cells */
+  padding: 0;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.page-menu button:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Current spread: neutral highlight, no accent colour */
+.page-menu button.is-current {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 560px) {
+  .arrow {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* ---------- Reduced motion: cover morph and crossfade become instant ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .book,
+  .spread,
+  .arrow,
+  .contact-btn {
+    transition: none;
+  }
+}
