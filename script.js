@@ -29,22 +29,22 @@
    ========================================================= */
 
 const PAGE_IMAGES = [
-  'jpg/6._01.jpg',
-  'jpg/6._02.jpg',
-  'jpg/6._03.jpg',
-  'jpg/6._04.jpg',
-  'jpg/6._05.jpg',
-  'jpg/6._06.jpg',
-  'jpg/6._07.jpg',
-  'jpg/6._08.jpg',
-  'jpg/6._09.jpg',
-  'jpg/6._10.jpg',
-  'jpg/6._11.jpg',
-  'jpg/6._12.jpg',
-  'jpg/6._13.jpg',
-  'jpg/6._14.jpg',
-  'jpg/6._15.jpg',
-  'jpg/6._16.jpg'
+  'jpg/6._01.webp',
+  'jpg/6._02.webp',
+  'jpg/6._03.webp',
+  'jpg/6._04.webp',
+  'jpg/6._05.webp',
+  'jpg/6._06.webp',
+  'jpg/6._07.webp',
+  'jpg/6._08.webp',
+  'jpg/6._09.webp',
+  'jpg/6._10.webp',
+  'jpg/6._11.webp',
+  'jpg/6._12.webp',
+  'jpg/6._13.webp',
+  'jpg/6._14.webp',
+  'jpg/6._15.webp',
+  'jpg/6._16.webp'
 ];
 
 /* ---------------------------------------------------------
@@ -106,6 +106,7 @@ function setPage(pageEl, pageIndex) {
   pageEl.classList.toggle('is-blank', !hasImage);
 
   if (hasImage) {
+    loadedPages.add(pageIndex);
     img.src = PAGE_IMAGES[pageIndex];
     img.alt = `Portfolio page ${pageIndex + 1}`;
   } else {
@@ -181,6 +182,7 @@ function goToSpread(target) {
   const crossingCover = SPREADS[currentSpread].single !== SPREADS[target].single;
   currentSpread = target;
   updateChrome();
+  preloadFrom(currentSpread);
 
   // Spread <-> spread: instant swap, no animation.
   if (!crossingCover) {
@@ -629,8 +631,51 @@ document.addEventListener('keydown', (event) => {
 });
 
 /* ---------------------------------------------------------
+   Preloader — fetches pages in the background, nearest
+   spreads first, so page turns render from cache instead of
+   hitting the network. Low priority and only a few at a
+   time, so it never competes with the spread on screen.
+   Re-centred on every turn: jump to the back cover and the
+   queue re-orders around it.
+   --------------------------------------------------------- */
+const PRELOAD_CONCURRENCY = 3;
+const loadedPages  = new Set();      // painted or cached
+const preloadQueue = [];
+let preloadActive = 0;
+
+function pageSpreadIndex(pageIndex) {
+  return SPREADS.findIndex((s) => s.left === pageIndex || s.right === pageIndex);
+}
+
+function preloadFrom(center) {
+  for (let i = 0; i < PAGE_IMAGES.length; i++) {
+    if (!loadedPages.has(i) && !preloadQueue.includes(i)) preloadQueue.push(i);
+  }
+  preloadQueue.sort((a, b) =>
+    Math.abs(pageSpreadIndex(a) - center) - Math.abs(pageSpreadIndex(b) - center));
+  drainPreload();
+}
+
+function drainPreload() {
+  while (preloadActive < PRELOAD_CONCURRENCY && preloadQueue.length > 0) {
+    const pageIndex = preloadQueue.shift();
+    preloadActive++;
+
+    const img = new Image();
+    img.fetchPriority = 'low';
+    img.onload = img.onerror = () => {
+      loadedPages.add(pageIndex);
+      preloadActive--;
+      drainPreload();
+    };
+    img.src = PAGE_IMAGES[pageIndex];
+  }
+}
+
+/* ---------------------------------------------------------
    Init
    --------------------------------------------------------- */
 book.classList.toggle('is-single', SPREADS[0].single);
 renderSpread(layers[0], SPREADS[0]);
 updateChrome();
+preloadFrom(0);
