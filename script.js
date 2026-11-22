@@ -29,22 +29,22 @@
    ========================================================= */
 
 const PAGE_IMAGES = [
-  'jpg/Preview_01_c',
-  'jpg/Preview_02_c',
-  'jpg/Preview_03_c',
-  'jpg/Preview_04_c',
-  'jpg/Preview_05_c',
-  'jpg/Preview_06_c',
-  'jpg/Preview_07_c',
-  'jpg/Preview_08_c',
-  'jpg/Preview_09_c',
-  'jpg/Preview_10_c',
-  'jpg/Preview_11_c',
-  'jpg/Preview_12_c',
-  'jpg/Preview_13_c',
-  'jpg/Preview_14_c',
-  'jpg/Preview_15_c',
-  'jpg/Preview_16_c'
+  'jpg/Preview_01_c.webp',
+  'jpg/Preview_02_c.webp',
+  'jpg/Preview_03_c.webp',
+  'jpg/Preview_04_c.webp',
+  'jpg/Preview_05_c.webp',
+  'jpg/Preview_06_c.webp',
+  'jpg/Preview_07_c.webp',
+  'jpg/Preview_08_c.webp',
+  'jpg/Preview_09_c.webp',
+  'jpg/Preview_10_c.webp',
+  'jpg/Preview_11_c.webp',
+  'jpg/Preview_12_c.webp',
+  'jpg/Preview_13_c.webp',
+  'jpg/Preview_14_c.webp',
+  'jpg/Preview_15_c.webp',
+  'jpg/Preview_16_c.webp'
 ];
 
 /* ---------------------------------------------------------
