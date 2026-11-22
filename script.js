@@ -29,25 +29,22 @@
    ========================================================= */
 
 const PAGE_IMAGES = [
-  'jpg/previewjpg1.jpg',
-  'jpg/previewjpg2.jpg',
-  'jpg/previewjpg3.jpg',
-  'jpg/previewjpg4.jpg',
-  'jpg/previewjpg5.jpg',
-  'jpg/previewjpg6.jpg',
-  'jpg/previewjpg7.jpg',
-  'jpg/previewjpg8.jpg',
-  'jpg/previewjpg9.jpg',
-  'jpg/previewjpg10.jpg',
-  'jpg/previewjpg11.jpg',
-  'jpg/previewjpg12.jpg',
-  'jpg/previewjpg13.jpg',
-  'jpg/previewjpg14.jpg',
-  'jpg/previewjpg15.jpg',
-  'jpg/previewjpg16.jpg',
-  'jpg/previewjpg17.jpg',
-  'jpg/previewjpg18.jpg',
-  'jpg/previewjpg19.jpg'
+  'jpg/6._01.jpg',
+  'jpg/6._02.jpg',
+  'jpg/6._03.jpg',
+  'jpg/6._04.jpg',
+  'jpg/6._05.jpg',
+  'jpg/6._06.jpg',
+  'jpg/6._07.jpg',
+  'jpg/6._08.jpg',
+  'jpg/6._09.jpg',
+  'jpg/6._10.jpg',
+  'jpg/6._11.jpg',
+  'jpg/6._12.jpg',
+  'jpg/6._13.jpg',
+  'jpg/6._14.jpg',
+  'jpg/6._15.jpg',
+  'jpg/6._16.jpg'
 ];
 
 /* ---------------------------------------------------------
@@ -585,7 +582,7 @@ contactPop.addEventListener('click', (event) => {
 
 /* ---------------------------------------------------------
    Type-to-jump: digits pressed anywhere form a page number.
-   Numbers that can't be extended ("2"–"9" in a 19-page book)
+    Numbers that can't be extended ("2"–"9" in a 16-page book)
    jump instantly; "1" waits briefly in case it becomes 10–19.
    --------------------------------------------------------- */
 let typeBuffer = '';
